@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta charset="UTF-8">
+      <title>github.yourself</title>
+
+      <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+      <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+      <link rel='stylesheet' href='/stylesheets/style.css' />
+
+      <script src="//code.jquery.com/jquery-2.1.3.min.js"></script>
+      <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+      <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular.min.js"></script>
+      <script>
+          var user = <%-JSON.stringify(user)%>;
+      </script>
+      <script src="/javascripts/home.js"></script>
+  </head>
+  <body ng-app="ghys" ng-controller="homeCtrl">
+  <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
+      <div class="container">
+          <div class="navbar-header">
+              <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+                  <span class="sr-only">Toggle navigation</span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+              </button>
+              <a href="/" class="navbar-brand">github.yourself</a>
+          </div>
+          <nav class="collapse navbar-collapse bs-navbar-collapse">
+              <ul class="nav navbar-nav">
+                  <!--<li class="active">-->
+                  <!--<a href="#"></a>-->
+                  <!--</li>-->
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                  <li ng-if="!user"><a href="/auth/github">Login</a></li>
+                  <li ng-if="user"><a href="#">{{user.displayName}}</a></li>
+                  <!--<li><a href="http://blog.getbootstrap.com" onclick="ga('send', 'event', 'Navbar', 'Community links', 'Blog');">Blog</a></li>-->
+              </ul>
+          </nav>
+      </div>
+      <div class="container">
+
+      </div>
+  </header>
+  </body>
+</html>
