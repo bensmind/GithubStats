@@ -30,7 +30,8 @@ passport.use(new GitHubStrategy({
         callbackURL: "http://127.0.0.1:3000/auth/github/callback"
     },
     function(accessToken, refreshToken, profile, done) {
-        // asynchronous verification, for effect...
+
+        profile.accessToken= accessToken;
         process.nextTick(function () {
             return done(null, profile);
         });
