@@ -6,15 +6,19 @@
 
       <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
       <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+      <link rel='stylesheet' href='/stylesheets/vendor/angular-chart.css' />
       <link rel='stylesheet' href='/stylesheets/style.css' />
 
       <script src="//code.jquery.com/jquery-2.1.3.min.js"></script>
       <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
       <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular.min.js"></script>
-      <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-      <script src="/javascripts/vendor/chartjs/Chart.min.js"></script>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
+
+      <script src="/javascripts/vendor/chartjs/Chart.js"></script>
       <script src="/javascripts/vendor/chartjs/Chart.StackedBar.js"></script>
-      <script src="/javascripts/vendor/chartjs/tc-angular-chartjs.js"></script>
+      <script src="/javascripts/vendor/chartjs/angular-chart.js"></script>
+
 
         <script>
           var user = <%-JSON.stringify(user || {})%>;
@@ -54,7 +58,13 @@
   </header>
   <div ng-if="user.id" class="container loggedIn">
     <div class="chart col-md-9">
-      <canvas tc-chartjs-stacked-bar chart-data="chart.data" chart-options="chart.options"></canvas>
+        <div class="controls form-inline">
+            <div class="form-group">
+            <input ng-model="chart.controls.startDate" type="date" class="form-control"/>
+            <input ng-model="chart.controls.endDate" type="date" class="form-control"/>
+            </div>
+        </div>
+      <canvas stacked-bar data="chart.data" labels="chart.labels" series="chart.series" legend="false" colours="chart.colours" ></canvas>
     </div>
     <div class="sidebar right col-md-3">
         <div class="orgs">

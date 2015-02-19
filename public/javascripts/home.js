@@ -14,80 +14,76 @@ Array.prototype.flatten= function(fun){
     return A;
 }
 
-var mod = angular.module('ghys', [ 'tc.chartjs' ])
+var mod = angular.module('ghys', [ 'chart.js' ])
+mod.constant('moment', moment)
 mod.value('$user', user);
 
-mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', function($scope, $http, $user, $q){
+mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', function($scope, $http, $user, $q, moment){
     $scope.user = $user;
-    $scope.user.repos = [];
-    $scope.user.orgs = [];
+
 
     if($scope.user.accessToken) {
+        //Logged in
         $http.defaults.headers.common.Authorization = 'Token ' + $user.accessToken;
     }
     else{
-        return;
+        return; //Not logged in
     }
 
+    $scope.user.repos = [];
+    $scope.user.orgs = [];
 
-    $scope.chart ={};
+    $scope.chart ={
+        labels:[],
+        series:['Additions', 'Deletions'],
+        data:[],
+        colours:['#55a532','#bd2c00'],
+        controls:{
+            startDate: moment().subtract(6, 'months').toDate(),
+            endDate: moment().toDate()
+        }
+    };
 
-    $scope.$watchCollection(function(){
-        return $scope.user.repos;
-    }, function(newVal){
-        if(!newVal || !newVal.length) return;
+    var utcOffset = moment().utcOffset(); //In minutes
 
-        var filtered = newVal.filter(function(r){
+    var pushChartData = function(repos){
+        var repoContributions = repos.filter(function(r){
             return r.contribution;
         }).map(function(f){return f.contribution;});
 
-        var weekRange = d3.extent(filtered.map(function(f){return f.weeks}).flatten(function(f){return f;}), function(ws){
-            return ws.w;
-        });
+        var additions = [], deletions = [], labels = [];
 
-        var data = {
-            labels:[],
-            datasets: [{
-                label: "Additions",
-                data: []
-            },
-                {
-                    label: "Deletions",
-                    data: []
-                }]
-        };
+        var weekRange =[moment().subtract(6, 'month').startOf('week'),moment().endOf('week')]
 
+        var weeks = repoContributions.map(function(rc){return rc.weeks;}).flatten()
+            .filter(function(w){
+                return moment.unix(w.w).isBetween(weekRange[0], weekRange[1]);
+            });
 
-
-            var i = weekRange[0];
+        var i = weekRange[0].add(utcOffset, 'minutes');
+        var nixs = []
         while(i < weekRange[1])
         {
+            var nix = i.unix();
+            nixs.push(nix);
+            var repoWeeks = weeks.filter(function(w) {
+                return w.w == nix;
+            });
+            var additionsSum = repoWeeks.reduce(function(prev, curr){return prev + curr.a;}, 0);
+            var deletionsSum = repoWeeks.reduce(function(prev, curr) {return prev + curr.d;}, 0);
 
+            labels.push(i.format('Wo-MM-YY'));
+            additions.push(additionsSum);
+            deletions.push(deletionsSum);
 
-                var additions = 0, deletions = 0;
-
-                filtered.forEach(function(r){
-
-                    var week = r.weeks.filter(function(f){
-                        return f.w == i;
-                    })[0];
-                    if(week){
-                        additions+=week.a;
-                        deletions+=week.d;
-                    }
-                    data.labels.push(d3.time.format('%x')(new Date(i)));
-                    data.datasets[0].data.push(additions);
-                    data.datasets[1].data.push(deletions);
-                });
-            i +=604800000;
+            i = i.add(1, 'week');
         }
-        $scope.chart.data =data;
-    });
-
-
+        $scope.chart.labels = labels;
+        $scope.chart.data = [additions, deletions];
+    };
 
     var getContributions = function(repos) {
-        return repos.map(function (repo) {
+        return $q.all(repos.flatten().map(function (repo) {
             return $http({method: 'GET', url: repo.url + '/stats/contributors'})
                 .then(function (result) {
                     updateRateLimit(result.headers);
@@ -97,42 +93,41 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', function($scope, $
                     repo.contribution = contribution;
                     return repo;
                 })
-                .then(addRepos);
-            });
-    };
 
-    var addRepos = function(repo){
-        $scope.user.repos.push(repo);
+            }));
     };
-
 
     function updateRateLimit(headers){
         $scope.rateLimit = headers && headers()['x-ratelimit-remaining'] || $scope.rateLimit || 0;
     }
 
-    $http({method:'GET', url:$user._json.repos_url})
+    var p1 =$http({method:'GET', url:$user._json.repos_url})
             .then(function(result){
                 updateRateLimit(result.headers);
                 return result.data;
             })
         .then(getContributions);
 
-    $http({method:'GET', url:$user._json.organizations_url})
+    var p2 = $http({method:'GET', url:$user._json.organizations_url})
         .then(function(result){
             updateRateLimit(result.headers);
             [].push.apply($scope.user.orgs, result.data);
             return result.data;
         })
-        .then(function(data){
-            return data.map(function(org){
+        .then(function(orgs){
+            return $q.all(orgs.map(function(org){
                 return $http({method:'GET', url:org.repos_url})
                     .then(function(result){
                         updateRateLimit(result.headers);
                         return result.data;
-                    })
-                    .then(getContributions);
-                });
-            });
+                    });
+                }));
+            })
+        .then(getContributions);
+
+    $q.all([p1, p2]).then(function(results){
+        return $scope.user.repos =results.flatten();
+    }).then(pushChartData);
 }]);
 
 
