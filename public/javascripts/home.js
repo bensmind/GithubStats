@@ -22,8 +22,17 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', function($scope, $
     $scope.user.repos = [];
     $scope.user.orgs = [];
 
+    if($scope.user.accessToken) {
+        $http.defaults.headers.common.Authorization = 'Token ' + $user.accessToken;
+    }
+    else{
+        return;
+    }
+
+
     $scope.chart ={};
-    $scope.$watch(function(){
+
+    $scope.$watchCollection(function(){
         return $scope.user.repos;
     }, function(newVal){
         if(!newVal || !newVal.length) return;
@@ -72,16 +81,10 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', function($scope, $
                 });
             i +=604800000;
         }
-
-
-
         $scope.chart.data =data;
-    }, true);
+    });
 
-    if($user)
-    {
-        $http.defaults.headers.common.Authorization = 'Token ' + $user.accessToken;
-    }
+
 
     var getContributions = function(repos) {
         return repos.map(function (repo) {

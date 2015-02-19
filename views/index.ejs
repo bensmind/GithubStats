@@ -35,12 +35,10 @@
           </div>
           <nav class="collapse navbar-collapse bs-navbar-collapse">
               <ul class="nav navbar-nav">
-                  <!--<li class="active">-->
-                  <!--<a href="#"></a>-->
-                  <!--</li>-->
+
               </ul>
               <ul class="nav navbar-nav navbar-right">
-                  <li ng-if="!user.id" class="login">
+                  <li ng-if="!user.id">
                       <a href="/auth/github">Login</a>
                   </li>
                   <li ng-if="user.id" class="user">
@@ -54,21 +52,21 @@
           </nav>
       </div>
   </header>
-  <div class="container">
-      <div class="chart">
-          <canvas tc-chartjs-stacked-bar chart-data="chart.data" chart-options="chart.options"></canvas>
-      </div>
-        <div class="sidebar right">
-            <div class="orgs">
-                <h3>Orgs</h3>
-              <div ng-repeat="org in user.orgs"><img src="{{org.avatar_url}}" class="avatar inline left"/>{{org.login}}</div>
-            </div>
-              <div>
-                  <h3>Repos</h3>
-                  <div ng-repeat="repo in user.repos"><a href="{{repo.html_url}}">{{repo.name}}</a>: {{repo.contribution.total}}</div>
-              </div>
+  <div ng-if="user.id" class="container loggedIn">
+    <div class="chart col-md-9">
+      <canvas tc-chartjs-stacked-bar chart-data="chart.data" chart-options="chart.options"></canvas>
+    </div>
+    <div class="sidebar right col-md-3">
+        <div class="orgs">
+            <h3>Orgs</h3>
+          <div ng-repeat="org in user.orgs"><img src="{{org.avatar_url}}" class="avatar inline left"/>{{org.login}}</div>
+        </div>
+          <div>
+              <h3>Repos</h3>
+              <div ng-repeat="repo in user.repos"><a href="{{repo.html_url}}">{{repo.name}}</a>: {{repo.contribution.total}}</div>
           </div>
       </div>
+  </div>
   <footer class="footer">
       <div class="container">
           <p ng-if="user.id" class="text-muted">Rate Limit Remaining: {{rateLimit}}</p>
