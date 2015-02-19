@@ -21,7 +21,6 @@ mod.value('$user', user);
 mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', function($scope, $http, $user, $q, moment){
     $scope.user = $user;
 
-
     if($scope.user.accessToken) {
         //Logged in
         $http.defaults.headers.common.Authorization = 'Token ' + $user.accessToken;
@@ -34,26 +33,35 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', function
     $scope.user.orgs = [];
 
     $scope.chart ={
+        options:{responsive:true},
         labels:[],
         series:['Additions', 'Deletions'],
         data:[],
         colours:['#55a532','#bd2c00'],
         controls:{
-            startDate: moment().subtract(6, 'months').toDate(),
+            startDate: moment().subtract(6, 'month').toDate(),
             endDate: moment().toDate()
         }
     };
 
     var utcOffset = moment().utcOffset(); //In minutes
 
-    var pushChartData = function(repos){
-        var repoContributions = repos.filter(function(r){
+    $scope.$watch('chart.controls', function(newVal){
+        if(!newVal || !newVal.startDate || !newVal.endDate)return;
+
+        return pushChartData(newVal.startDate, newVal.endDate)
+    }, true);
+
+    var pushChartData = function(startDate, endDate){
+        startDate = moment(startDate), endDate = moment(endDate);
+
+        var repoContributions = $scope.user.repos.filter(function(r){
             return r.contribution;
         }).map(function(f){return f.contribution;});
 
         var additions = [], deletions = [], labels = [];
 
-        var weekRange =[moment().subtract(6, 'month').startOf('week'),moment().endOf('week')]
+        var weekRange =[startDate.startOf('week'),endDate.endOf('week')]
 
         var weeks = repoContributions.map(function(rc){return rc.weeks;}).flatten()
             .filter(function(w){
@@ -72,7 +80,7 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', function
             var additionsSum = repoWeeks.reduce(function(prev, curr){return prev + curr.a;}, 0);
             var deletionsSum = repoWeeks.reduce(function(prev, curr) {return prev + curr.d;}, 0);
 
-            labels.push(i.format('Wo-MM-YY'));
+            labels.push(i.format('D-MMM-YY'));
             additions.push(additionsSum);
             deletions.push(deletionsSum);
 
@@ -127,7 +135,9 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', function
 
     $q.all([p1, p2]).then(function(results){
         return $scope.user.repos =results.flatten();
-    }).then(pushChartData);
+    }).then(function(){
+        return pushChartData($scope.chart.controls.startDate, $scope.chart.controls.endDate);
+    });
 }]);
 
 

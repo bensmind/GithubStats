@@ -46,7 +46,7 @@
                       <a href="/auth/github">Login</a>
                   </li>
                   <li ng-if="user.id" class="user">
-                      <a href="{{user._json.html_url}}"><img src="{{user._json.avatar_url}}" class="avatar inline round left" />{{user.displayName}}</a>
+                      <a href="{{user._json.html_url}}"><img ng-src="{{user._json.avatar_url}}" class="avatar inline round left" />{{user.displayName}}</a>
                   </li>
                   <li ng-if="user.id" class="logout">
                       <a href="/auth/logout">Logout</a>
@@ -56,20 +56,25 @@
           </nav>
       </div>
   </header>
+
   <div ng-if="user.id" class="container loggedIn">
     <div class="chart col-md-9">
         <div class="controls form-inline">
             <div class="form-group">
-            <input ng-model="chart.controls.startDate" type="date" class="form-control"/>
-            <input ng-model="chart.controls.endDate" type="date" class="form-control"/>
+                <label for="startDate">Start Date:</label>
+                <input ng-model="chart.controls.startDate" type="date" id="startDate" class="form-control"/>
+            </div>
+            <div class="form-group">
+                <label for="endDate">End Date:</label>
+                <input ng-model="chart.controls.endDate" type="date" id="endDate" class="form-control"/>
             </div>
         </div>
-      <canvas stacked-bar data="chart.data" labels="chart.labels" series="chart.series" legend="false" colours="chart.colours" ></canvas>
+      <canvas stacked-bar data="chart.data" labels="chart.labels" series="chart.series" legend="false" colours="chart.colours" options="chart.options" ></canvas>
     </div>
     <div class="sidebar right col-md-3">
         <div class="orgs">
             <h3>Orgs</h3>
-          <div ng-repeat="org in user.orgs"><img src="{{org.avatar_url}}" class="avatar inline left"/>{{org.login}}</div>
+          <div ng-repeat="org in user.orgs"><img ng-src="{{org.avatar_url}}" class="avatar inline left"/>{{org.login}}</div>
         </div>
           <div>
               <h3>Repos</h3>
