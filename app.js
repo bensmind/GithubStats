@@ -9,9 +9,8 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
-var users = require('./routes/users');
 
-var config = require('./bin/env.json')[process.env.NODE_ENV || 'development'];
+var config = require('./config.json')[process.env.NODE_ENV || 'development'];
 var util = require('util');
 var passport = require('passport');
 var GitHubStrategy = require('passport-github').Strategy;
@@ -25,9 +24,9 @@ passport.deserializeUser(function(obj, done) {
 });
 
 passport.use(new GitHubStrategy({
-        clientID: config.GITHUB_CLIENT_ID,
-        clientSecret: config.GITHUB_CLIENT_SECRET,
-        callbackURL: "http://127.0.0.1:3000/auth/github/callback"
+        clientID: config.github.clientId,
+        clientSecret: config.github.clientSecret,
+        callbackURL: config.server.protocol + "://" + config.server.host + ":" + config.server.port + "/auth/github/callback"
     },
     function(accessToken, refreshToken, profile, done) {
 
@@ -45,14 +44,14 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(__dirname + '/public/favicon.ico'));
+// uncomment after placing your favicon in /static
+//app.use(favicon(__dirname + '/static/favicon.ico'));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(require('less-middleware')(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(require('less-middleware')(path.join(__dirname, 'static')));
+app.use(express.static(path.join(__dirname, 'static')));
 
 //Auth
 app.use(methodOverride());
@@ -61,7 +60,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/', routes);
-app.use('/users', users);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -95,4 +93,4 @@ app.use(function(err, req, res, next) {
 });
 
 
-module.exports = app;
+var server = app.listen(config.server.port)

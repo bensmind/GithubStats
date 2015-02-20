@@ -33,6 +33,7 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', function
     $scope.user.orgs = [];
 
     $scope.chart ={
+        type:"StackedBar",
         options:{responsive:true},
         labels:[],
         series:['Additions', 'Deletions'],

@@ -2,4 +2,6 @@
 bin/
 node_modules/
 bower_components/
+static/lib/**
+npm-debug.log
 
