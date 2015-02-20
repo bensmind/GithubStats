@@ -55,7 +55,8 @@
   </header>
 
   <div ng-if="user.id" class="container loggedIn">
-    <div class="chart col-md-9">
+    <div class="chart col-sm-12 col-md-9">
+      <canvas chart-base chart-type="chart.type" data="chart.data" labels="chart.labels" series="chart.series" legend="false" colours="chart.colours" options="chart.options" ></canvas>
         <div class="controls form-inline">
             <div class="form-group">
                 <label for="startDate">Start Date:</label>
@@ -66,7 +67,6 @@
                 <input ng-model="chart.controls.endDate" type="date" id="endDate" class="form-control"/>
             </div>
         </div>
-      <canvas chart-base chart-type="chart.type" data="chart.data" labels="chart.labels" series="chart.series" legend="false" colours="chart.colours" options="chart.options" ></canvas>
     </div>
     <div class="sidebar right col-md-3">
         <div class="orgs">

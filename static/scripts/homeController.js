@@ -1,3 +1,4 @@
+
 Array.prototype.flatten= function(fun){
     if(typeof fun!= 'function') fun= '';
     var A= [], L= this.length, itm;
@@ -34,13 +35,16 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', function
 
     $scope.chart ={
         type:"StackedBar",
-        options:{responsive:true},
+        options:{
+            responsive:true,
+            scaleBeginAtZero : false
+        },
         labels:[],
         series:['Additions', 'Deletions'],
         data:[],
         colours:['#55a532','#bd2c00'],
         controls:{
-            startDate: moment().subtract(6, 'month').toDate(),
+            startDate: moment().subtract(3, 'month').toDate(),
             endDate: moment().toDate()
         }
     };
@@ -61,31 +65,26 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', function
         }).map(function(f){return f.contribution;});
 
         var additions = [], deletions = [], labels = [];
-
-        var weekRange =[startDate.startOf('week'),endDate.endOf('week')]
-
         var weeks = repoContributions.map(function(rc){return rc.weeks;}).flatten()
             .filter(function(w){
-                return moment.unix(w.w).isBetween(weekRange[0], weekRange[1]);
+                return moment.unix(w.w).isBetween(startDate, endDate);
             });
 
-        var i = weekRange[0].add(utcOffset, 'minutes');
-        var nixs = []
-        while(i < weekRange[1])
+        var currentWeek = startDate.add(1, 'w').startOf('week').add(utcOffset, 'minutes');
+
+        while(currentWeek < endDate)
         {
-            var nix = i.unix();
-            nixs.push(nix);
             var repoWeeks = weeks.filter(function(w) {
-                return w.w == nix;
+                return w.w == currentWeek.unix();
             });
             var additionsSum = repoWeeks.reduce(function(prev, curr){return prev + curr.a;}, 0);
             var deletionsSum = repoWeeks.reduce(function(prev, curr) {return prev + curr.d;}, 0);
 
-            labels.push(i.format('D-MMM-YY'));
+            labels.push(currentWeek.format('D-MMM-YY'));
             additions.push(additionsSum);
             deletions.push(deletionsSum);
 
-            i = i.add(1, 'week');
+            currentWeek.add(1, 'week');
         }
         $scope.chart.labels = labels;
         $scope.chart.data = [additions, deletions];
