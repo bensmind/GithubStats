@@ -1,100 +1,92 @@
 <!DOCTYPE html>
 <html>
-  <head>
-      <meta charset="UTF-8">
-      <title>github.yourself</title>
+<head>
+    <meta charset="UTF-8">
+    <title>github.yourself</title>
 
-      <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-      <!--<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">-->
-      <link rel="stylesheet" href="/lib/chartjs.package.css"/>
-      <link rel='stylesheet' href='/css/style.css' />
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/lib/chartjs.package.css"/>
+    <link rel='stylesheet' href='/css/style.css'/>
 
-      <script src="//code.jquery.com/jquery-2.1.3.min.js"></script>
-      <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <script src="//code.jquery.com/jquery-2.1.3.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 
-      <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular.min.js"></script>
-      <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
 
-      <script src="/lib/chartjs.package.js"></script>
+    <script src="/lib/chartjs.package.js"></script>
 
-      <script>
-          var user = <%-JSON.stringify(user || {})%>;
-        </script>
-      <script src="/scripts/homeController.js"></script>
-  </head>
-  <body ng-app="ghys" ng-controller="homeCtrl">
-  <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
-      <div class="container">
-          <div class="navbar-header">
-              <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
-                  <span class="sr-only">Toggle navigation</span>
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-              </button>
-              <a href="/" class="navbar-brand">github.yourself</a>
-          </div>
-          <nav class="collapse navbar-collapse bs-navbar-collapse">
-              <ul class="nav navbar-nav navbar-right">
-                  <li><a href="#">Link</a></li>
-                  <li class="dropdown">
-                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                          <img ng-src="{{user._json.avatar_url}}" class="avatar inline round left" />{{user.displayName}} <span class="caret"></span>
-                      </a>
-                      <ul class="dropdown-menu" role="menu">
-                          <li><a href="/auth/logout">Logout</a></li>
-                          <!--<li class="divider"></li>-->
-                      </ul>
-                  </li>
-              </ul>
-              <ul class="nav navbar-nav navbar-right">
-                  <li ng-if="!user.id">
-                      <a href="/auth/github">Login</a>
-                  </li>
-                  <!--<li ng-if="user.id" class="user">-->
-                      <!--<a href="{{user._json.html_url}}"><img ng-src="{{user._json.avatar_url}}" class="avatar inline round left" />{{user.displayName}}</a>-->
-                  <!--</li>-->
-                  <!--<li ng-if="user.id" class="logout">-->
-                      <!--<a href="/auth/logout">Logout</a>-->
-                  <!--</li>-->
-                  <!--<li><a href="http://blog.getbootstrap.com" onclick="ga('send', 'event', 'Navbar', 'Community links', 'Blog');">Blog</a></li>-->
-              </ul>
-          </nav>
-      </div>
-  </header>
-
-  <div ng-if="user.id" class="container loggedIn">
-    <div class="chart col-sm-12 col-md-9">
-      <canvas chart-base chart-type="chart.type" data="chart.data" labels="chart.labels" series="chart.series" legend="false" colours="chart.colours" options="chart.options" ></canvas>
-        <div class="controls form-inline">
-            <div class="form-group">
-                <label for="startDate">Start Date:</label>
-                <input ng-model="chart.controls.startDate" type="date" id="startDate" class="form-control"/>
+    <script>
+        var user = <%-JSON.stringify(user || {})%>;
+    </script>
+    <script src="/scripts/homeController.js"></script>
+</head>
+<body ng-app="ghys" ng-controller="homeCtrl">
+<div ng-if="user.id" class="container-fluid">
+    <div class="row">
+        <div class="col-sm-8 col-md-9 chart">
+            <div class="page-header brand clearfix">
+                <h1>github <small>yourself</small></h1>
+                <div class="controls form-inline">
+                    <div class="form-group">
+                        <label for="startDate">Start Date:</label>
+                        <input ng-model="chart.controls.startDate" type="date" id="startDate" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="endDate">End Date:</label>
+                        <input ng-model="chart.controls.endDate" type="date" id="endDate" class="form-control"/>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="endDate">End Date:</label>
-                <input ng-model="chart.controls.endDate" type="date" id="endDate" class="form-control"/>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <canvas chart-base chart-type="chart.type" data="chart.data" labels="chart.labels" series="chart.series"
+                            legend="false" colours="chart.colours" options="chart.options"></canvas>
+                </div>
             </div>
         </div>
+        <div class="sidebar col-sm-4 col-md-3">
+    <div class="page-header clearfix">
+        <div class="sig" style="float:left;">
+
+            <img ng-src="{{user._json.avatar_url}}" class="avatar inline round left" style="display: inline-block"/>
+            <span style="display: inline-block">
+            <h1 style="display: inline">
+                {{user.displayName}}
+            </h1>
+                <br>
+            <h4 style="display: inline">
+                <small>Total:</small>
+                <span class="label label-default" title="Total (Additions + Deletions)">{{user.total | nrFormat}}</span>
+                <span class="label label-success">+ {{user.additions | nrFormat}}</span>
+                <span class="label label-danger">- {{user.deletions | nrFormat}}</span>
+            </h4>
+                </span>
+
+        </div>
     </div>
-    <div class="sidebar right col-md-3">
-        <div class="list-group">
-            <span class="list-group-item active">Orgs</span>
-            <span ng-repeat="org in user.orgs" class="list-group-item">
-                <img ng-src="{{org.avatar_url}}" class="avatar inline left"/>{{org.login}}
-            </span>
-            <span class="list-group-item active">Repos</span>
+        <div class="">
+            <!--<span class="list-group-item active">Orgs</span>-->
+            <!--<span ng-repeat="org in user.orgs" class="list-group-item">-->
+                <!--<img ng-src="{{org.avatar_url}}" class="avatar inline left"/>{{org.login}}-->
+            <!--</span>-->
+            <!--<span class="list-group-item active">Repos</span>-->
             <a ng-repeat="repo in user.repos" ng-href="{{repo.html_url}}" class="list-group-item">
                 <span class="badge">{{repo.contribution.total}}</span>
                 {{repo.name}}
             </a>
         </div>
-      </div>
-  </div>
-  <footer class="footer">
-      <div class="container">
-          <p ng-if="user.id" class="text-muted">Rate Limit Remaining: {{rateLimit}}</p>
-      </div>
-  </footer>
-  </body>
+        </div>
+
+
+    </div>
+
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <p ng-if="user.id" class="text-muted" >Rate Limit Remaining: {{rateLimit}}</p>
+    </div>
+</footer>
+</body>
 </html>

@@ -1,26 +1,43 @@
 
-.navbar-nav{
-  .user { a {}
+.page-header{padding-bottom: 20px;
+  &.brand{
+    h1{float:left; margin-bottom:0;}
+    .controls{float:right;margin-top:20px; }
   }
+
 }
-.chart{
-  float: left;
-  margin-top:20px;
-  .controls{margin-top:20px;}
+.sig img.avatar.inline{
+height:55px;
 }
 
-.sidebar{
+.chart{
+
+  .controls{}
+}
+
+.sidebar {
+  position: fixed;
+  top: 0px;
+  bottom: 0;
+  right: 0;
+  z-index: 1000;
+  display: block;
+  padding:0 20px;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 header.navbar{
   background-color: #f5f5f5;
   border-bottom: 1px solid #e5e5e5;
 }
+
 img.avatar {
   &.inline {
-    height: 20px;
+    height:20px;
+    vertical-align: -6px;
   }
   &.left {
-    margin-right: 5px;
+    margin-right: 10px;
   }
   &.round {
     border-radius: 10px;

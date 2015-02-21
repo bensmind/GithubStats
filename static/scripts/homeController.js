@@ -18,7 +18,22 @@ Array.prototype.flatten= function(fun){
 var mod = angular.module('ghys', [ 'chart.js' ])
 mod.constant('moment', moment)
 mod.value('$user', user);
-
+mod.filter('nrFormat', function(){
+    return function(number){
+        if(number!= undefined){
+            var abs = Math.abs(number);
+            if(abs >= Math.pow(10, 12))// trillion
+                number = (number / Math.pow(10, 12)).toFixed(1)+"t";
+            else if (abs < Math.pow(10, 12) && abs >= Math.pow(10, 9))// billion
+                number = (number / Math.pow(10, 9)).toFixed(1)+"b";
+            else if (abs < Math.pow(10, 9) && abs >= Math.pow(10, 6))// million
+                number = (number / Math.pow(10, 6)).toFixed(1)+"m";
+            else if (abs < Math.pow(10, 6) && abs >= Math.pow(10, 3))// thousand
+                number = (number / Math.pow(10, 3)).toFixed(1)+"k";
+        }
+        return number;
+    }
+});
 mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', function($scope, $http, $user, $q, moment){
     $scope.user = $user;
 
@@ -32,7 +47,7 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', function
 
     $scope.user.repos = [];
     $scope.user.orgs = [];
-
+    $scope.user.total = 0,$scope.user.additions =0, $scope.user.deletions = 0
     $scope.chart ={
         type:"StackedBar",
         options:{
@@ -85,9 +100,13 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', function
             additions.push(additionsSum);
             deletions.push(deletionsSum);
 
+
             currentWeek.add(1, 'week');
         }
         $scope.chart.labels = labels;
+        $scope.user.additions = additions.reduce(function(prev, curr){return prev + curr;},0 );
+        $scope.user.deletions = deletions.reduce(function(prev, curr){return prev + curr;},0 );
+        $scope.user.total = $scope.user.additions + $scope.user.deletions;
         $scope.chart.data = [additions, deletions];
     };
 
