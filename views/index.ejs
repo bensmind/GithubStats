@@ -5,7 +5,7 @@
       <title>github.yourself</title>
 
       <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-      <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+      <!--<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">-->
       <link rel="stylesheet" href="/lib/chartjs.package.css"/>
       <link rel='stylesheet' href='/css/style.css' />
 
@@ -35,19 +35,28 @@
               <a href="/" class="navbar-brand">github.yourself</a>
           </div>
           <nav class="collapse navbar-collapse bs-navbar-collapse">
-              <ul class="nav navbar-nav">
-
+              <ul class="nav navbar-nav navbar-right">
+                  <li><a href="#">Link</a></li>
+                  <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                          <img ng-src="{{user._json.avatar_url}}" class="avatar inline round left" />{{user.displayName}} <span class="caret"></span>
+                      </a>
+                      <ul class="dropdown-menu" role="menu">
+                          <li><a href="/auth/logout">Logout</a></li>
+                          <!--<li class="divider"></li>-->
+                      </ul>
+                  </li>
               </ul>
               <ul class="nav navbar-nav navbar-right">
                   <li ng-if="!user.id">
                       <a href="/auth/github">Login</a>
                   </li>
-                  <li ng-if="user.id" class="user">
-                      <a href="{{user._json.html_url}}"><img ng-src="{{user._json.avatar_url}}" class="avatar inline round left" />{{user.displayName}}</a>
-                  </li>
-                  <li ng-if="user.id" class="logout">
-                      <a href="/auth/logout">Logout</a>
-                  </li>
+                  <!--<li ng-if="user.id" class="user">-->
+                      <!--<a href="{{user._json.html_url}}"><img ng-src="{{user._json.avatar_url}}" class="avatar inline round left" />{{user.displayName}}</a>-->
+                  <!--</li>-->
+                  <!--<li ng-if="user.id" class="logout">-->
+                      <!--<a href="/auth/logout">Logout</a>-->
+                  <!--</li>-->
                   <!--<li><a href="http://blog.getbootstrap.com" onclick="ga('send', 'event', 'Navbar', 'Community links', 'Blog');">Blog</a></li>-->
               </ul>
           </nav>
@@ -69,14 +78,17 @@
         </div>
     </div>
     <div class="sidebar right col-md-3">
-        <div class="orgs">
-            <h3>Orgs</h3>
-          <div ng-repeat="org in user.orgs"><img ng-src="{{org.avatar_url}}" class="avatar inline left"/>{{org.login}}</div>
+        <div class="list-group">
+            <span class="list-group-item active">Orgs</span>
+            <span ng-repeat="org in user.orgs" class="list-group-item">
+                <img ng-src="{{org.avatar_url}}" class="avatar inline left"/>{{org.login}}
+            </span>
+            <span class="list-group-item active">Repos</span>
+            <a ng-repeat="repo in user.repos" ng-href="{{repo.html_url}}" class="list-group-item">
+                <span class="badge">{{repo.contribution.total}}</span>
+                {{repo.name}}
+            </a>
         </div>
-          <div>
-              <h3>Repos</h3>
-              <div ng-repeat="repo in user.repos"><a href="{{repo.html_url}}">{{repo.name}}</a>: {{repo.contribution.total}}</div>
-          </div>
       </div>
   </div>
   <footer class="footer">

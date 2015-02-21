@@ -37,7 +37,8 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', function
         type:"StackedBar",
         options:{
             responsive:true,
-            scaleBeginAtZero : false
+            scaleBeginAtZero : false,
+            barStrokeWidth : 1
         },
         labels:[],
         series:['Additions', 'Deletions'],
