@@ -60,8 +60,12 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', 'github.
 
     var pushChartData = function(startDate, endDate){
         startDate = moment(startDate), endDate = moment(endDate);
+        var orgRepos =$scope.user.orgs.map(function(org){
+            return org.repos;
+        }).flatten();
+        var repoContributions = $scope.user.repos.concat(orgRepos);
 
-        var repoContributions = $scope.user.repos.filter(function(r){
+        repoContributions = repoContributions.filter(function(r){
             return r.contribution;
         }).map(function(f){return f.contribution;});
 
@@ -112,9 +116,9 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', 'github.
             return $q.all(orgs.map(function(org){
                 org.repos = [];
                 $user.orgs.push(org);
-                return $q.all(repoApi.getOrgRepos(org,updateRateLimit)
+                return repoApi.getOrgRepos(org,updateRateLimit)
                     .then(function(repos){
-                        return repos.map(function(repo){
+                        return $q.all(repos.map(function(repo){
                             return repoApi.getContributions(repo, updateRateLimit)
                                 .then(function(contributions){
                                     repo.contribution = contributions.filter(function (contrib) {
@@ -126,10 +130,13 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', 'github.
                                     org.repos.push(repoWithContributions);
                                     return repoWithContributions;
                                 });
-                            });
+                            })
+                        );
                     })
-                    .then(function(){return org;})
-                );
+                    .then(function(data){
+                        return org;
+                    })                    
+                
             }));
         });
 
