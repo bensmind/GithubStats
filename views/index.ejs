@@ -64,9 +64,11 @@
   </header>
 
   <div ng-if="user.id" class="container loggedIn">
-    <div class="chart col-sm-12 col-md-9">
-      <canvas chart-base chart-type="chart.type" data="chart.data" labels="chart.labels" series="chart.series" legend="false" colours="chart.colours" options="chart.options" ></canvas>
-        <div class="controls form-inline">
+    <div class="chart col-lg-12">
+        <div class="row">
+            <canvas chart-base chart-type="chart.type" data="chart.data" labels="chart.labels" series="chart.series" legend="false" colours="chart.colours" options="chart.options" height="100"></canvas>
+        </div>
+        <div class="controls form-inline well row">
             <div class="form-group">
                 <label for="startDate">Start Date:</label>
                 <input ng-model="chart.controls.startDate" type="date" id="startDate" class="form-control"/>
@@ -76,24 +78,27 @@
                 <input ng-model="chart.controls.endDate" type="date" id="endDate" class="form-control"/>
             </div>
         </div>
-    </div>
-    <div class="sidebar right col-md-3">
-        <div class="panel panel-default" ng-repeat="org in user.orgs">
-            <div class="panel-heading"><img ng-src="{{org.avatar_url}}" class="avatar inline left"/>{{org.login}}</div>
-            <div class="list-group">
-            <a ng-repeat="repo in org.repos" ng-href="{{repo.html_url}}" class="list-group-item">
-                <span class="badge">{{repo.contribution.total}}</span>
-                {{repo.name}}
-            </a>
+        <div class="row">
+            <div class="list-group col-md-4">
+                <a ng-repeat="repo in user.repos" ng-href="{{repo.html_url}}" class="list-group-item">
+                    <span class="badge">{{repo.contribution.total}}</span>
+                    {{repo.name}}
+                </a>
+            </div>
+            <div class="col-md-4" ng-repeat="org in user.orgs">
+                <div class="panel panel-default" >
+                    <div class="panel-heading"><img ng-src="{{org.avatar_url}}" class="avatar inline left"/>{{org.login}}</div>
+                    <div class="list-group">
+                        <a ng-repeat="repo in org.repos" ng-href="{{repo.html_url}}" class="list-group-item">
+                            <span class="badge">{{repo.contribution.total}}</span>
+                            {{repo.name}}
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="list-group">
-            <a ng-repeat="repo in user.repos" ng-href="{{repo.html_url}}" class="list-group-item">
-                <span class="badge">{{repo.contribution.total}}</span>
-                {{repo.name}}
-            </a>
-        </div>
-      </div>
+    </div>
+
   </div>
   <footer class="footer">
       <div class="container">

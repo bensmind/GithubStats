@@ -36,6 +36,7 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', 'github.
     $scope.chart ={
         type:"StackedBar",
         options:{
+            scaleSteps:10,
             responsive:true,
             scaleBeginAtZero : false,
             barStrokeWidth : 1
