@@ -15,11 +15,11 @@ Array.prototype.flatten= function(fun){
     return A;
 }
 
-var mod = angular.module('ghys', [ 'chart.js' ])
+var mod = angular.module('ghys', [ 'chart.js', 'github.api' ])
 mod.constant('moment', moment)
 mod.value('$user', user);
 
-mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', function($scope, $http, $user, $q, moment){
+mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', 'github.api.repo', 'github.api.user', function($scope, $http, $user, $q, moment, repoApi, userApi){
     $scope.user = $user;
 
     if($scope.user.accessToken) {
@@ -91,27 +91,37 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', function
         $scope.chart.data = [additions, deletions];
     };
 
-
-
-    var loadRepos = getUserRepos($user)
+    var loadRepos = userApi.getUserRepos(updateRateLimit)
         .then(function(repos){
-            return repos.map(function(repo){
-                return getContributions(repo)
+            return $q.all(repos.map(function(repo){
+                return repoApi.getContributions(repo, updateRateLimit)
+                    .then(function(contributions){
+                        repo.contribution = contributions.filter(function (contrib) {
+                            return contrib.author.login === $user._json.login;
+                        })[0];
+                        return repo;
+                    })
                     .then(function(repoWithContributions){
                         user.repos.push(repoWithContributions);
                     });
-            });
+            }));
         });
 
-    var loadOrgRepos = getUserOrgs($user)
+    var loadOrgRepos = userApi.getUserOrgs(updateRateLimit)
         .then(function(orgs){
-            return orgs.map(function(org){
+            return $q.all(orgs.map(function(org){
                 org.repos = [];
                 $user.orgs.push(org);
-                return $q.all(getOrgRepos(org)
+                return $q.all(repoApi.getOrgRepos(org,updateRateLimit)
                     .then(function(repos){
                         return repos.map(function(repo){
-                            return getContributions(repo)
+                            return repoApi.getContributions(repo, updateRateLimit)
+                                .then(function(contributions){
+                                    repo.contribution = contributions.filter(function (contrib) {
+                                        return contrib.author.login === $user._json.login;
+                                    })[0];
+                                    return repo;
+                                })
                                 .then(function(repoWithContributions){
                                     org.repos.push(repoWithContributions);
                                     return repoWithContributions;
@@ -120,10 +130,8 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', function
                     })
                     .then(function(){return org;})
                 );
-            });
+            }));
         });
-
-
 
     $q.all([loadRepos, loadOrgRepos]).then(function(){
         return pushChartData($scope.chart.controls.startDate, $scope.chart.controls.endDate);
@@ -131,46 +139,8 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', function
         $scope.loading = false;
     });
 
-    function getUserRepos(user){
-        return $http({method:'GET', url:user._json.repos_url})
-            .then(function(result){
-                updateRateLimit(result.headers);
-                return result.data;
-            });
-    }
-    function getUserOrgs(user){
-        return $http({method:'GET', url:user._json.organizations_url})
-            .then(function(result){
-                updateRateLimit(result.headers);
-                return result.data;
-            });
-    }
-
-    function getOrgRepos(org){
-        return $http({method:'GET', url:org.repos_url})
-            .then(function(result){
-                updateRateLimit(result.headers);
-                return result.data;
-            });
-    }
-
-    function getContributions(repo) {
-        return $http({method: 'GET', url: repo.url + '/stats/contributors'})
-            .then(function (result) {
-                updateRateLimit(result.headers);
-                if(!result.data || !result.data.length) {
-                    debugger;
-                    return;
-                }
-                var contribution = result.data.filter(function (contrib) {
-                    return contrib.author.login === $user._json.login;
-                })[0];
-                repo.contribution = contribution;
-                return repo;
-            });
-    };
-
-    function updateRateLimit(headers){
+    function updateRateLimit(result){
+        var headers = result && result.headers;
         $scope.rateLimit = headers && headers()['x-ratelimit-remaining'] || $scope.rateLimit || 0;
     }
 }]);
