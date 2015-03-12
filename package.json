@@ -28,7 +28,8 @@
     "morgan": "~1.5.1",
     "passport": "^0.2.1",
     "passport-github": "^0.1.5",
-    "serve-favicon": "~2.2.0"
+    "serve-favicon": "~2.2.0",
+    "vhost": "^3.0.0"
   },
   "devDependencies": {
     "gulp": "^3.8.11",

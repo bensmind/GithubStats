@@ -11,6 +11,16 @@ gulp.task('bower', function() {
         .pipe(gulp.dest('bower_components/'));
 });
 
+gulp.task('momentjs',['bower'],function(){
+    var include = filter(['moment/min/moment.min.js', 'moment-range/lib/moment-range.min.js']);
+
+    return gulp.src('bower_components/**')
+        .pipe(include)
+        .pipe(concat('moment.package.js'))
+        .pipe(uglify())
+        .pipe(gulp.dest('static/lib/'));
+});
+
 gulp.task('chartjs',['bower'],function(){
     var include = filter([
         'Chart.js/Chart.min.js',
@@ -30,4 +40,4 @@ gulp.task('chartcss', ['bower'], function(){
         .pipe(rename('chartjs.package.css'))
         .pipe(gulp.dest('static/lib/'))
 })
-gulp.task('default', ['chartjs', 'chartcss']);
+gulp.task('default', ['chartjs', 'chartcss', 'momentjs']);

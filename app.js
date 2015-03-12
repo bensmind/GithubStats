@@ -1,5 +1,5 @@
 var express = require('express');
-
+var vhost = require('vhost')
 var methodOverride = require('method-override');
 var session = require('express-session');
 var path = require('path');
@@ -92,5 +92,11 @@ app.use(function(err, req, res, next) {
     });
 });
 
+var vhost = vhost(config.hostname || 'localhost', app);
 
-var server = app.listen(config.server.port)
+var server = express();
+server.use(vhost);
+
+var server = app.listen(config.server.port, function(){
+    console.log('Server started');
+})

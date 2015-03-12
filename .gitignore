@@ -5,3 +5,4 @@ bower_components/
 static/lib/**
 npm-debug.log
 
+config.*.json

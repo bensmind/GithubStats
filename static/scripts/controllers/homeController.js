@@ -61,6 +61,7 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', 'github.
 
     var pushChartData = function(startDate, endDate){
         startDate = moment(startDate), endDate = moment(endDate);
+
         var orgRepos =$scope.user.orgs.map(function(org){
             return org.repos;
         }).flatten();
@@ -71,17 +72,17 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', 'github.
         }).map(function(f){return f.contribution;});
 
         var additions = [], deletions = [], labels = [];
-        var weeks = repoContributions.map(function(rc){return rc.weeks;}).flatten()
-            .filter(function(w){
-                return moment.unix(w.w).isBetween(startDate, endDate);
-            });
+        
+        var startWeek = startDate.add(1, 'w').startOf('week');     
 
-        var currentWeek = startDate.add(1, 'w').startOf('week').add(utcOffset, 'minutes');
+        var range = moment.range(startWeek, endDate);
 
-        while(currentWeek < endDate)
-        {
-            var repoWeeks = weeks.filter(function(w) {
-                return w.w == currentWeek.unix();
+        range.by('weeks', function(currentWeek){
+            var currentWeekUnix = currentWeek.add(currentWeek.utcOffset(), 'minutes');    
+            var repoWeeks = repoContributions
+                .map(function(rc){return rc.weeks;})
+                .flatten().filter(function(w){                    
+                return w.w == currentWeekUnix.unix();
             });
             var additionsSum = repoWeeks.reduce(function(prev, curr){return prev + curr.a;}, 0);
             var deletionsSum = repoWeeks.reduce(function(prev, curr) {return prev + curr.d;}, 0);
@@ -89,9 +90,8 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', 'github.
             labels.push(currentWeek.format('D-MMM-YY'));
             additions.push(additionsSum);
             deletions.push(deletionsSum);
+        })
 
-            currentWeek.add(1, 'week');
-        }
         $scope.chart.labels = labels;
         $scope.chart.data = [additions, deletions];
     };

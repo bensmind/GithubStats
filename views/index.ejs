@@ -13,8 +13,8 @@
       <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 
       <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular.min.js"></script>
-      <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
-
+      <!--<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>-->
+        <script src="/lib/moment.package.js"></script>
       <script src="/lib/chartjs.package.js"></script>
 
       <script>
@@ -71,11 +71,11 @@
         <div class="controls form-inline well row">
             <div class="form-group">
                 <label for="startDate">Start Date:</label>
-                <input ng-model="chart.controls.startDate" type="date" id="startDate" class="form-control"/>
+                <input ng-model="chart.controls.startDate" type="date" step="7" id="startDate" class="form-control"/>
             </div>
             <div class="form-group">
                 <label for="endDate">End Date:</label>
-                <input ng-model="chart.controls.endDate" type="date" id="endDate" class="form-control"/>
+                <input ng-model="chart.controls.endDate" type="date" step="7" id="endDate" class="form-control"/>
             </div>
         </div>
         <div class="row">
