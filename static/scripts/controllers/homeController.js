@@ -14,6 +14,13 @@ Array.prototype.flatten= function(fun){
     }
     return A;
 }
+Array.prototype.max = function() {
+  return Math.max.apply(null, this);
+};
+
+Array.prototype.min = function() {
+  return Math.min.apply(null, this);
+};
 
 var mod = angular.module('ghys', [ 'chart.js', 'github.api' ])
 mod.constant('moment', moment)
@@ -36,9 +43,7 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', 'github.
     $scope.chart ={
         type:"StackedBar",
         options:{
-            scaleSteps:10,
             responsive:true,
-            scaleBeginAtZero : false,
             barStrokeWidth : 1
         },
         labels:[],
@@ -74,23 +79,27 @@ mod.controller('homeCtrl', ['$scope', '$http', '$user', '$q', 'moment', 'github.
         var additions = [], deletions = [], labels = [];
         
         var startWeek = startDate.add(1, 'w').startOf('week');     
+        var startWeekOffset = moment(startWeek).add(startWeek.utcOffset(), 'minutes');    
+        var selectedContributions = repoContributions
+                .map(function(rc){return rc.weeks;})
+                .flatten().filter(function(w){
+                    return w.w >= startWeekOffset.unix() && w.w <= endDate.unix();
+                })
 
         var range = moment.range(startWeek, endDate);
 
         range.by('weeks', function(currentWeek){
             var currentWeekUnix = currentWeek.add(currentWeek.utcOffset(), 'minutes');    
-            var repoWeeks = repoContributions
-                .map(function(rc){return rc.weeks;})
-                .flatten().filter(function(w){                    
+            var repoWeeks = selectedContributions.filter(function(w){                    
                 return w.w == currentWeekUnix.unix();
             });
             var additionsSum = repoWeeks.reduce(function(prev, curr){return prev + curr.a;}, 0);
             var deletionsSum = repoWeeks.reduce(function(prev, curr) {return prev + curr.d;}, 0);
-
+            
             labels.push(currentWeek.format('D-MMM-YY'));
             additions.push(additionsSum);
             deletions.push(deletionsSum);
-        })
+        });
 
         $scope.chart.labels = labels;
         $scope.chart.data = [additions, deletions];
